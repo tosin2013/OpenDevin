@@ -9,6 +9,8 @@ check_and_start_docker() {
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
         sudo apt-get update
         sudo apt-get install -y docker-ce make
+        #sudo groupadd docker
+        sudo usermod -aG docker $USER
     fi
 
     # Check if Docker service is running
@@ -49,29 +51,18 @@ git checkout live
 make build
 
 curl -fsSL https://ollama.com/install.sh | sh
+sleep 30s
 ollama pull mistral:7b
 
-cat >config.toml<<EOF
-LLM_API_KEY="ollama"
-LLM_MODEL="ollama/mistral:7b"
-LLM_EMBEDDING_MODEL="local"
-LLM_BASE_URL="http://localhost:11434"
-WORKSPACE_DIR="./workspace"
-EOF
+make setup-config
+###
+# cat >config.toml<<EOF
+# LLM_API_KEY="ollama"
+# LLM_MODEL="ollama/mistral:7b"
+# LLM_EMBEDDING_MODEL="local"
+# LLM_BASE_URL="http://localhost:11434"
+# WORKSPACE_DIR="./workspace"
+# EOF
 
-# The directory you want OpenDevin to work with. MUST be an absolute path!
-export WORKSPACE_BASE=$(pwd)/workspace;
+make run
 
-# Create a user in ubuntu to be used for ssh access 
-
-docker run -it \
-    --pull=always \
-    -e SANDBOX_USER_ID=\
-    -e PERSIST_SANDBOX="true" \
-    -e SSH_PASSWORD='CHANGME' \
-    -e WORKSPACE_MOUNT_PATH=$WORKSPACE_BASE \
-    -v $WORKSPACE_BASE:/opt/workspace_base \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -p 3000:3000 \
-    --add-host host.docker.internal:host-gateway \
-    ghcr.io/opendevin/opendevin:0.5
