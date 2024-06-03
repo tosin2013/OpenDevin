@@ -80,3 +80,4 @@ main() {
 
 # Call the main function to start the installation process
 main
+
