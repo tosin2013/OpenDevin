@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Function to check if Docker is installed and start Docker service if it's not running
 check_and_start_docker() {
     if ! command -v docker &> /dev/null; then
@@ -21,48 +23,60 @@ check_and_start_docker() {
     fi
 }
 
+# Function to check if Node.js is installed and install it if necessary
+check_and_install_node() {
+    if ! command -v node &> /dev/null; then
+        # Install npm and create-react-app
+        curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
+        sudo apt -y install nodejs
+        node  -v
+    fi
+}
 
-curl -OL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-source /root/.bashrc
+# Function to check if Poetry is installed and install it if necessary
+check_and_install_poetry() {
+    if ! command -v poetry &> /dev/null; then
+        # Install Poetry
+        curl -fsSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+    fi
+}
 
-conda create -n opendevin python=3.11
-conda activate opendevin
+# Function to check if the configuration file exists and create it if necessary
+check_and_create_config() {
+    if [ ! -f config.toml ]; then
+        # Create the configuration file
+        cat >config.toml<<EOF
+LLM_API_KEY="ollama"
+LLM_MODEL="ollama/mistral:7b"
+LLM_EMBEDDING_MODEL="local"
+LLM_BASE_URL="http://localhost:11434"
+WORKSPACE_DIR="./workspace"
+EOF
+    fi
+}
 
+# Function to check if the workspace directory exists and create it if necessary
+check_and_create_workspace() {
+    if [ ! -d $WORKSPACE_DIR ]; then
+        # Create the workspace directory
+        mkdir $WORKSPACE_DIR
+    fi
+}
 
-# Check if Node.js is installed
-if ! command -v node &> /dev/null; then
-    # Install npm and create-react-app
-    curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
-    sudo apt -y install nodejs
-    node  -v
-fi
+# Function to check if the OpenDevin server is running and start it if necessary
+check_and_start_opendevin() {
+        make run
+}
 
+# Main function to check for dependencies and install them if necessary
+main() {
+    check_and_start_docker
+    check_and_install_node
+    check_and_install_poetry
+    check_and_create_config
+    check_and_create_workspace
+    check_and_start_opendevin
+}
 
-sudo apt update
-sudo apt install pipx
-pipx ensurepath
-sudo pipx ensurepath --global
-pipx install poetry #  curl -sSL https://install.python-poetry.org | python3.11 -
-
-git clone https://github.com/tosin2013/OpenDevin.git
-cd OpenDevin
-git checkout live
-make build
-
-curl -fsSL https://ollama.com/install.sh | sh
-sleep 30s
-ollama pull mistral:7b
-
-make setup-config
-###
-# cat >config.toml<<EOF
-# LLM_API_KEY="ollama"
-# LLM_MODEL="ollama/mistral:7b"
-# LLM_EMBEDDING_MODEL="local"
-# LLM_BASE_URL="http://localhost:11434"
-# WORKSPACE_DIR="./workspace"
-# EOF
-
-make run
-
+# Call the main function to start the installation process
+main
