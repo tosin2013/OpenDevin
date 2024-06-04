@@ -63,6 +63,16 @@ check_and_start_docker() {
     else
         echo "Docker service is already running."
     fi
+
+    # Test Docker installation by running a simple container
+    echo "Testing Docker installation with hello-world container..."
+    if docker run hello-world &> /dev/null; then
+        echo "Docker is working correctly."
+    else
+        echo "Failed to run Docker container. Check Docker installation and permissions."
+        echo "Exit shell log back in and try again"
+        exit 1
+    fi
 }
 
 # Function to check if Node.js is installed and install it if necessary
@@ -84,10 +94,8 @@ check_and_install_node() {
 check_and_install_poetry() {
     if ! command -v poetry &> /dev/null; then
         echo "Poetry is not installed. Installing..."
-        sudo apt update
-        sudo apt install pipx -y
-        pipx ensurepath
-        pipx install poetry
+        curl -sSL https://install.python-poetry.org | python3.11 -
+        export PATH="$HOME/.local/bin:$PATH"
     else
         echo "Poetry is already installed."
     fi
@@ -170,7 +178,7 @@ setup_ollama_llm() {
         echo "Starting Ollama server..."
         sudo systemctl start ollama
     fi
-    
+
     # Check existing models and pull if not present
     existing_models=$(ollama list)
     declare -a models=("codellama:70b" "gemma:7b" "dolphin-mixtral:8x22b" "deepseek-v2:236b" "codestral:22b")
