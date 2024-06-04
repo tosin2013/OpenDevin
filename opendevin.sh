@@ -1,8 +1,55 @@
 #!/bin/bash
 # Uncomment for debugging
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-set -x
+#export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+#set -x
 
+# Function to display help
+usage() {
+    echo "Usage: $0 [-b] [-r] [-i] [-h]"
+    echo "  -b : Build the project"
+    echo "  -r : Run the project"
+    echo "  -i : Install dependencies"
+    echo "  -h : Display this help menu"
+}
+
+# Initialize variables for flags
+BUILD=false
+RUN=false
+INSTALL=false
+
+
+
+while getopts "brih" opt; do
+    case $opt in
+        b)
+            BUILD=true
+            ;;
+        r)
+            RUN=true
+            ;;
+        i)
+            INSTALL=true
+            ;;
+        h)
+            usage
+            exit 0
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+echo "BUILD: $BUILD, RUN: $RUN, INSTALL: $INSTALL"
+
+
+# Check if no options were provided
+if [ $# -eq 0 ]; then
+    usage
+    exit 0
+fi
 
 # Function to check for and install Conda if it's not installed
 check_and_install_conda() {
@@ -192,21 +239,33 @@ setup_ollama_llm() {
     done
 }
 
-
-
 # Main function to check for dependencies and install them if necessary
+# Main function to execute based on flags
 main() {
-    check_and_start_docker
-    check_and_install_node
-    check_and_install_conda
-    setup_conda_environment
-    check_and_install_poetry
-    clone_and_cd_opendevin
-    setup_ollama_llm
-    check_and_create_config
-    check_and_create_workspace
-    check_and_start_opendevin
-}
+    if $INSTALL; then
+        check_and_start_docker
+        check_and_install_node
+        check_and_install_conda
+        setup_conda_environment
+        check_and_install_poetry
+        clone_and_cd_opendevin
+        setup_ollama_llm
+        check_and_create_config
+        check_and_create_workspace
+    fi
 
+    if $BUILD; then
+        check_and_start_opendevin
+    fi
+
+    if $RUN; then
+        # Ensure we are in the correct directory
+        if [ "$(pwd)" != "$HOME/OpenDevin" ]; then
+            echo "Changing to the OpenDevin directory..."
+            cd "$HOME/OpenDevin"
+        fi
+        make run
+    fi
+}
 # Call the main function to start the installation process
 main
