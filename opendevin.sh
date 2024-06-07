@@ -228,7 +228,7 @@ setup_ollama_llm() {
 
     # Check existing models and pull if not present
     existing_models=$(ollama list)
-    declare -a models=("codellama:70b" "gemma:7b" "dolphin-mixtral:8x22b" "deepseek-v2:236b" "codestral:22b")
+    declare -a models=("qwen2:7b" "codellama:70b" "dolphin-mixtral:8x22b" "deepseek-v2:236b" "codestral:22b")
     for model in "${models[@]}"; do
         if [[ ! $existing_models =~ $model ]]; then
             echo "Model $model not found. Pulling model..."
