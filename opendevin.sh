@@ -156,7 +156,7 @@ check_and_create_config() {
         echo "Configuration file not found. Creating config.toml..."
         cat >config.toml<<EOF
 LLM_API_KEY="ollama"
-LLM_MODEL="ollama/mistral:7b"
+LLM_MODEL="ollama/qwen2:7b"
 LLM_EMBEDDING_MODEL="local"
 LLM_BASE_URL="http://localhost:11434"
 WORKSPACE_DIR="./workspace"
@@ -228,7 +228,7 @@ setup_ollama_llm() {
 
     # Check existing models and pull if not present
     existing_models=$(ollama list)
-    declare -a models=("qwen2:7b" "codellama:70b" "dolphin-mixtral:8x22b" "deepseek-v2:236b" "codestral:22b")
+    declare -a models=("qwen2:7b" "codellama:70b" "xingyaow/codeact-agent-mistral" "deepseek-v2:236b" "codestral:22b")
     for model in "${models[@]}"; do
         if [[ ! $existing_models =~ $model ]]; then
             echo "Model $model not found. Pulling model..."
