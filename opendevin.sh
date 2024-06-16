@@ -5,11 +5,11 @@
 
 # Function to display help
 usage() {
-    echo "Usage: $0 [-b] [-r] [-i] [-s] [-h]"
+    echo "Usage: $0 [-b] [-r] [-i] [-o] [-h]"
     echo "  -b : Build the project"
     echo "  -r : Run the project"
     echo "  -i : Install dependencies"
-    echo "  -s : Skip Ollama deployment"
+    echo "  -o : Include Ollama deployment"
     echo "  -h : Display this help menu"
 }
 
@@ -17,9 +17,9 @@ usage() {
 BUILD=false
 RUN=false
 INSTALL=false
-SKIP_OLLAMA=false
+SKIP_OLLAMA=true  # Default to skipping Ollama deployment
 
-while getopts "bris" opt; do
+while getopts "brioh" opt; do
     case $opt in
         b)
             BUILD=true
@@ -30,8 +30,8 @@ while getopts "bris" opt; do
         i)
             INSTALL=true
             ;;
-        s)
-            SKIP_OLLAMA=true
+        o)
+            SKIP_OLLAMA=false
             ;;
         h)
             usage
@@ -55,7 +55,7 @@ fi
 
 # Function to check for and install Conda if it's not installed
 check_and_install_conda() {
-    if ! command -v conna &> /dev/null; then
+    if ! command -v conda &> /dev/null; then
         echo "Conda is not installed. Installing Miniconda..."
         wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
         bash ~/miniconda.sh -b -p $HOME/miniconda
@@ -208,7 +208,7 @@ clone_and_cd_opendevin() {
 # Function to install and manage Ollama LLM
 setup_ollama_llm() {
     if $SKIP_OLLAMA; then
-        echo "Skipping Ollama deployment as per user request."
+        echo "Skipping Ollama deployment by default."
         return
     fi
 
