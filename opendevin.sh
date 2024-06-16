@@ -5,10 +5,11 @@
 
 # Function to display help
 usage() {
-    echo "Usage: $0 [-b] [-r] [-i] [-h]"
+    echo "Usage: $0 [-b] [-r] [-i] [-s] [-h]"
     echo "  -b : Build the project"
     echo "  -r : Run the project"
     echo "  -i : Install dependencies"
+    echo "  -s : Skip Ollama deployment"
     echo "  -h : Display this help menu"
 }
 
@@ -16,10 +17,9 @@ usage() {
 BUILD=false
 RUN=false
 INSTALL=false
+SKIP_OLLAMA=false
 
-
-
-while getopts "brih" opt; do
+while getopts "bris" opt; do
     case $opt in
         b)
             BUILD=true
@@ -29,6 +29,9 @@ while getopts "brih" opt; do
             ;;
         i)
             INSTALL=true
+            ;;
+        s)
+            SKIP_OLLAMA=true
             ;;
         h)
             usage
@@ -42,8 +45,7 @@ while getopts "brih" opt; do
     esac
 done
 
-echo "BUILD: $BUILD, RUN: $RUN, INSTALL: $INSTALL"
-
+echo "BUILD: $BUILD, RUN: $RUN, INSTALL: $INSTALL, SKIP_OLLAMA: $SKIP_OLLAMA"
 
 # Check if no options were provided
 if [ $# -eq 0 ]; then
@@ -79,8 +81,6 @@ setup_conda_environment() {
         conda activate opendevin
     fi
 }
-
-
 
 # Function to check if Docker is installed and start Docker service if it's not running
 check_and_start_docker() {
@@ -136,7 +136,6 @@ check_and_install_node() {
     fi
 }
 
-
 # Function to check if Poetry is installed and install it if necessary
 check_and_install_poetry() {
     if ! command -v poetry &> /dev/null; then
@@ -147,7 +146,6 @@ check_and_install_poetry() {
         echo "Poetry is already installed."
     fi
 }
-
 
 # Function to check if the configuration file exists and create it if necessary
 check_and_create_config() {
@@ -209,6 +207,11 @@ clone_and_cd_opendevin() {
 
 # Function to install and manage Ollama LLM
 setup_ollama_llm() {
+    if $SKIP_OLLAMA; then
+        echo "Skipping Ollama deployment as per user request."
+        return
+    fi
+
     # Check if Ollama is already installed
     if ! command -v ollama &> /dev/null; then
         echo "Ollama is not installed. Installing Ollama..."
@@ -267,5 +270,6 @@ main() {
         make run
     fi
 }
+
 # Call the main function to start the installation process
 main
