@@ -1,0 +1,71 @@
+name: Deploy and Destroy DigitalOcean Droplet
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'Git repository URL'
+        default: 'https://github.com/tosin2013/OpenDevin.git'
+        required: true
+      project_name:
+        description: 'Project name'
+        default: 'OpenDevin'
+        required: true
+      script_name:
+        description: 'Script name'
+        default: './opendevin.sh'
+        required: true
+      git_branch:
+        description: 'Git branch to checkout'
+        default: 'live'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Generate Droplet Name
+      id: generate_name
+      run: |
+        NAME="opendevin-$(date +%s)"
+        echo "::set-output name=droplet_name::$NAME"
+
+    - name: Create Droplet
+      run: |
+        doctl compute droplet create ${{ steps.generate_name.outputs.droplet_name }} \
+          --region nyc3 \
+          --image ubuntu-20-04-x64 \
+          --size s-2vcpu-2gb-amd \
+          --ssh-keys ${{ secrets.SSH_KEY }} \
+          --wait
+
+    - name: Get Droplet IP
+      id: droplet_ip
+      run: |
+        IP=$(doctl compute droplet list ${{ steps.generate_name.outputs.droplet_name }} --format PublicIPv4 --no-header)
+        echo "::set-output name=ip::$IP"
+
+    - name: Wait for SSH
+      run: sleep 60
+
+    - name: Run scripts on Droplet
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY_PATH }} ${{ secrets.SSH_USERNAME }}@${{ steps.droplet_ip.outputs.ip }} << 'EOF'
+          cd /home/${{ secrets.SSH_USERNAME }}
+          git clone -b ${{ github.event.inputs.git_branch }} ${{ github.event.inputs.repo_url }} ${{ github.event.inputs.project_name }}
+          cd ${{ github.event.inputs.project_name }}
+          ${{ github.event.inputs.script_name }}
+        EOF
+
+    - name: Destroy Droplet
+      run: |
+        doctl compute droplet delete ${{ steps.generate_name.outputs.droplet_name }} --force
