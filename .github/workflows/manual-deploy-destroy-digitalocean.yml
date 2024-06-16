@@ -49,12 +49,20 @@ jobs:
           --ssh-keys ${{ secrets.SSH_KEY }} \
           --wait
 
+    - name: Wait for Droplet to be Ready
+      run: sleep 30
+
     - name: Get Droplet IP
       id: droplet_ip
       run: |
         IP=$(doctl compute droplet list ${{ env.droplet_name }} --format PublicIPv4 --no-header)
+        echo "Retrieved IP: $IP"
         echo "::set-output name=ip::$IP"
         echo "droplet_ip=${IP}" >> $GITHUB_ENV
+
+    - name: Debug Environment Variable
+      run: |
+        echo "Environment Variable droplet_ip: ${{ env.droplet_ip }}"
 
     - name: Debug IP Address
       run: |
