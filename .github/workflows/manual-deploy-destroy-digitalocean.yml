@@ -62,7 +62,7 @@ jobs:
     - name: Run scripts on Droplet
       uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ steps.droplet_ip.outputs.ip }}
+        host: ${{ env.ip }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
