@@ -1,0 +1,57 @@
+# OpenAI
+export OPENAI_API_KEY="your_openai_api_key"
+export OPENAI_API_BASE="https://api.openai.com/v1"
+
+# Anthropic
+export ANTHROPIC_API_KEY="your_anthropic_api_key"
+
+# Vertex AI (Google Cloud)
+export VERTEX_PROJECT="your_vertex_project_id"
+export VERTEX_LOCATION="your_vertex_location"
+
+# HuggingFace
+export HUGGINGFACE_API_KEY="your_huggingface_api_key"
+export HUGGINGFACE_API_BASE="https://api-inference.huggingface.co"
+
+# Azure OpenAI
+export AZURE_API_KEY="your_azure_api_key"
+export AZURE_API_BASE="https://your-azure-endpoint.openai.azure.com/"
+export AZURE_API_VERSION="2023-05-15"
+export AZURE_API_TYPE="azure"
+
+# Ollama
+export OLLAMA_API_KEY="your_ollama_api_key"
+export OLLAMA_API_BASE="http://localhost:11434"
+
+# OpenRouter
+export OPENROUTER_API_KEY="your_openrouter_api_key"
+export OPENROUTER_API_BASE="https://openrouter.ai/api/v1"
+
+# Cohere
+export COHERE_API_KEY="your_cohere_api_key"
+
+# Together AI
+export TOGETHERAI_API_KEY="your_togetherai_api_key"
+
+# Replicate
+export REPLICATE_API_KEY="your_replicate_api_key"
+
+# DeepSeek
+export DEEPSEEK_API_KEY="your_deepseek_api_key"
+
+# Bedrock (AWS)
+export AWS_ACCESS_KEY_ID="your_aws_access_key_id"
+export AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key"
+export AWS_REGION="your_aws_region"
+
+# IBM Watson
+export WATSON_API_KEY="your_watson_api_key"
+export WATSON_URL="your_watson_url"
+
+# Miscellaneous settings
+export LITELLM_PROXY_PORT="4000"
+export LITELLM_PROXY_HOST="0.0.0.0"
+export LITELLM_NUM_WORKERS="4"
+export LITELLM_DEBUG="True"
+export LITELLM_DETAILED_DEBUG="True"
+export LITELLM_TELEMETRY="False"
