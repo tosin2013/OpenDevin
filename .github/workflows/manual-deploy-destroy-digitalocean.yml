@@ -1,24 +1,7 @@
 name: Deploy and Destroy DigitalOcean Droplet
 
 on:
-  workflow_dispatch:
-    inputs:
-      repo_url:
-        description: 'Git repository URL'
-        default: 'https://github.com/tosin2013/OpenDevin.git'
-        required: true
-      project_name:
-        description: 'Project name'
-        default: 'OpenDevin'
-        required: true
-      script_name:
-        description: 'Script name'
-        default: './opendevin.sh'
-        required: true
-      git_branch:
-        description: 'Git branch to checkout'
-        default: 'live'
-        required: true
+  workflow_dispatch
 
 jobs:
   deploy:
@@ -60,9 +43,9 @@ jobs:
       run: sleep 60
 
     - name: Run scripts on Droplet
-      uses: appleboy/ssh-action@v0.1.10
+      uses: appleboy/ssh-action@v2
       with:
-        host: ${{ env.ip }}
+        host: ${{ env.droplet_ip }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
