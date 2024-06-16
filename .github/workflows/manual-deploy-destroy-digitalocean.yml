@@ -1,7 +1,24 @@
 name: Deploy and Destroy DigitalOcean Droplet
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'Git repository URL'
+        default: 'https://github.com/tosin2013/OpenDevin.git'
+        required: true
+      project_name:
+        description: 'Project name'
+        default: 'OpenDevin'
+        required: true
+      script_name:
+        description: 'Script name'
+        default: './opendevin.sh'
+        required: true
+      git_branch:
+        description: 'Git branch to checkout'
+        default: 'live'
+        required: true
 
 jobs:
   deploy:
@@ -39,11 +56,15 @@ jobs:
         echo "::set-output name=ip::$IP"
         echo "droplet_ip=${IP}" >> $GITHUB_ENV
 
+    - name: Debug IP Address
+      run: |
+        echo "Droplet IP: ${{ env.droplet_ip }}"
+
     - name: Wait for SSH
       run: sleep 60
 
     - name: Run scripts on Droplet
-      uses: appleboy/ssh-action@v2
+      uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ env.droplet_ip }}
         username: ${{ secrets.SSH_USERNAME }}
