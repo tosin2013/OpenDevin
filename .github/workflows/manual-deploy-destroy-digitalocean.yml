@@ -62,7 +62,7 @@ jobs:
     - name: Run scripts on Droplet
       uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ env.droplet_ip }}
+        host: ${{ steps.droplet_ip.outputs.ip }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
@@ -76,4 +76,3 @@ jobs:
     - name: Destroy Droplet
       run: |
         doctl compute droplet delete ${{ env.droplet_name }} --force
-
