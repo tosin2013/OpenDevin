@@ -45,8 +45,8 @@ jobs:
           --region nyc3 \
           --image ubuntu-22-04-x64 \
           --size s-2vcpu-2gb-amd \
-          --vpc-uuid ${{ secrets.VPC_UUID }} \
-          --ssh-keys ${{ secrets.SSH_KEY_IDS }} \
+          --vpc-uuid ${{ secrets.VPC_ID }} \
+          --ssh-keys ${{ secrets.SSH_KEY }} \
           --wait
 
     - name: Get Droplet IP
