@@ -43,9 +43,9 @@ jobs:
       run: |
         doctl compute droplet create ${{ steps.generate_name.outputs.droplet_name }} \
           --region nyc3 \
-          --image ubuntu-22-04-x64\
+          --image ubuntu-22-04-x64 \
           --size s-2vcpu-2gb-amd \
-          --vpc-uuid  ${{ secrets.VPC_ID }} \
+          --vpc-uuid ${{ secrets.VPC_ID }} \
           --ssh-keys ${{ secrets.SSH_KEY }} \
           --wait
 
@@ -58,10 +58,16 @@ jobs:
     - name: Wait for SSH
       run: sleep 60
 
+    - name: Create SSH key file
+      id: create_ssh_key
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+        chmod 600 private_key
+
     - name: Run scripts on Droplet
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY_PATH }} ${{ secrets.SSH_USERNAME }}@${{ steps.droplet_ip.outputs.ip }} << 'EOF'
-          cd ${{ secrets.SSH_USERNAME }}
+        ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USERNAME }}@${{ steps.droplet_ip.outputs.ip }} << 'EOF'
+          cd /home/${{ secrets.SSH_USERNAME }}
           git clone -b ${{ github.event.inputs.git_branch }} ${{ github.event.inputs.repo_url }} ${{ github.event.inputs.project_name }}
           cd ${{ github.event.inputs.project_name }}
           ${{ github.event.inputs.script_name }}
@@ -70,3 +76,7 @@ jobs:
     - name: Destroy Droplet
       run: |
         doctl compute droplet delete ${{ steps.generate_name.outputs.droplet_name }} --force
+
+    - name: Clean up SSH key file
+      if: always()
+      run: rm private_key
