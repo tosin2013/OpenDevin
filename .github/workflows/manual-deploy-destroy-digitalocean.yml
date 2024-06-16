@@ -43,8 +43,9 @@ jobs:
       run: |
         doctl compute droplet create ${{ steps.generate_name.outputs.droplet_name }} \
           --region nyc3 \
-          --image ubuntu-20-04-x64 \
+          --image ubuntu-22-04-x64\
           --size s-2vcpu-2gb-amd \
+          --vpc-uuid  ${{ secrets.VPC_ID }} \
           --ssh-keys ${{ secrets.SSH_KEY }} \
           --wait
 
