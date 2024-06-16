@@ -61,7 +61,7 @@ jobs:
     - name: Run scripts on Droplet
       run: |
         ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY_PATH }} ${{ secrets.SSH_USERNAME }}@${{ steps.droplet_ip.outputs.ip }} << 'EOF'
-          cd /home/${{ secrets.SSH_USERNAME }}
+          cd ${{ secrets.SSH_USERNAME }}
           git clone -b ${{ github.event.inputs.git_branch }} ${{ github.event.inputs.repo_url }} ${{ github.event.inputs.project_name }}
           cd ${{ github.event.inputs.project_name }}
           ${{ github.event.inputs.script_name }}
