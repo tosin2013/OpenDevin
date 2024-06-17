@@ -65,14 +65,15 @@ jobs:
             --vpc-uuid "${{ secrets.VPC_ID }}" \
             --ssh-keys "${{ secrets.SSH_KEY }}" \
             --wait \
-            --user-data "#cloud-config
+            --user-data '#cloud-config
             users:
-            - name: ${SSH_USERNAME}
-            ssh-authorized-keys:
-            - ${SSH_KEY}
-            sudo: ['ALL=(ALL) NOPASSWD:ALL']
-            groups: sudo
-            shell: /bin/bash"
+              - name: ${SSH_USERNAME}
+                ssh-authorized-keys:
+                  - ${SSH_KEY}
+                sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+                groups: sudo
+                shell: /bin/bash'
+  
 
     - name: Wait for Droplet to be Ready
       if: github.event.inputs.delete_vm != 'true'
