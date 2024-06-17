@@ -83,7 +83,8 @@ jobs:
           cd ${{ secrets.SSH_USERNAME }}
           git clone -b ${{ github.event.inputs.git_branch }} ${{ github.event.inputs.repo_url }} ${{ github.event.inputs.project_name }}
           cd ${{ github.event.inputs.project_name }}
-          ${{ github.event.inputs.script_name }}
+          chmod +x ${{ github.event.inputs.script_name }}
+          ${{ github.event.inputs.script_name }} -i -b
 
     - name: Destroy Droplet
       run: |
