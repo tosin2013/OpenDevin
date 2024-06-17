@@ -187,7 +187,8 @@ check_and_start_opendevin() {
 
     echo "Building OpenDevin..."
     source $HOME/miniconda/etc/profile.d/conda.sh
-    source ~/.bashrc  # or source ~/zshrc
+    export PATH="$HOME/.local/bin:$PATH"
+    source ~/.bashrc  # or source ~/.zshrc
     make build
     echo "Starting the OpenDevin server..."
     make run
@@ -269,6 +270,9 @@ main() {
             echo "Changing to the OpenDevin directory..."
             cd "$HOME/OpenDevin"
         fi
+        source $HOME/miniconda/etc/profile.d/conda.sh
+        export PATH="$HOME/.local/bin:$PATH"
+        source ~/.bashrc  # or source ~/.zshrc
         make run
     fi
 }
