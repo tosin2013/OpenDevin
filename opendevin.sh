@@ -267,6 +267,19 @@ setup_ollama_llm() {
     done
 }
 
+# Export functions to be used by the new user
+export -f check_and_install_conda
+export -f setup_conda_environment
+export -f check_and_start_docker
+export -f check_and_install_node
+export -f check_and_install_poetry
+export -f check_and_create_config
+export -f check_and_create_workspace
+export -f check_and_start_opendevin
+export -f clone_and_cd_opendevin
+export -f setup_ollama_llm
+
+
 # Main function to check for dependencies and install them if necessary
 main() {
     if $INSTALL; then
