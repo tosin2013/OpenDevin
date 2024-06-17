@@ -1,7 +1,7 @@
 #!/bin/bash
 # Uncomment for debugging
-#export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-#set -x
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+set -x
 export DEBIAN_FRONTEND=noninteractive
 
 # Function to display help
