@@ -45,6 +45,13 @@ jobs:
       with:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
+    - name: Generate Droplet Name
+      id: generate_name
+      if: github.event.inputs.delete_vm != 'true'
+      run: |
+        NAME="devika-$(date +%s)"
+        echo "droplet_name=${NAME}" >> $GITHUB_ENV
+
     - name: Create Droplet
       if: github.event.inputs.delete_vm != 'true'
       env:
