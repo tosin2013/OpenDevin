@@ -17,7 +17,7 @@ on:
         required: true
       git_branch:
         description: 'Git branch to checkout'
-        default: 'live'
+        default: 'main'
         required: true
 
 jobs:
