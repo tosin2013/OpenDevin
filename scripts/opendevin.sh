@@ -192,8 +192,8 @@ check_and_start_opendevin() {
     export PATH="$HOME/.local/bin:$PATH"
     source ~/.bashrc  # or source ~/.zshrc
     make build || (echo "Build failed. Retrying..." && make build) || exit $?
-    echo "Starting the OpenDevin server..."
-    make run || exit $?
+    #echo "Starting the OpenDevin server..."
+    #make run || exit $?
 }
 
 # Function to check if the OpenDevin directory exists in the $HOME directory
