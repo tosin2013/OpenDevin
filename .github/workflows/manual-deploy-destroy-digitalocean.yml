@@ -24,9 +24,9 @@ on:
         default: 'false'
         required: true
         type: choice
-          options:
-            - "true" 
-            - "false"
+        options:
+          - "true" 
+          - "false"
       vm_name:
         description: 'Name of the VM to delete'
         default: ''
