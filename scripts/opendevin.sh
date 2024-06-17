@@ -54,26 +54,6 @@ if [ $# -eq 0 ]; then
     exit 0
 fi
 
-# Function to create a new user
-create_user() {
-    local username=$1
-    if ! id -u $username &>/dev/null; then
-        sudo adduser --disabled-password --gecos "" $username
-        sudo usermod -aG sudo $username
-        sudo mkdir -p /home/$username/.ssh
-        sudo cp ~/.ssh/authorized_keys /home/$username/.ssh/
-        sudo chown -R $username:$username /home/$username/.ssh
-        sudo chmod 700 /home/$username/.ssh
-        sudo chmod 600 /home/$username/.ssh/authorized_keys
-        echo "$username ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$username
-    else
-        echo "User $username already exists."
-    fi
-}
-
-# Create the ubuntu user
-create_user "ubuntu"
-
 # Function to check for and install Conda if it's not installed
 check_and_install_conda() {
     if ! command -v conda &> /dev/null; then
@@ -150,7 +130,7 @@ check_and_install_node() {
         echo "Node.js is not installed. Installing..."
         curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
         sudo apt -y install nodejs
-        node -v
+        node  -v
         echo "Node.js has been installed."
     else
         echo "Node.js is already installed."
@@ -267,39 +247,35 @@ setup_ollama_llm() {
     done
 }
 
-# Export functions to be used by the new user
-export -f check_and_install_conda
-export -f setup_conda_environment
-export -f check_and_start_docker
-export -f check_and_install_node
-export -f check_and_install_poetry
-export -f check_and_create_config
-export -f check_and_create_workspace
-export -f check_and_start_opendevin
-export -f clone_and_cd_opendevin
-export -f setup_ollama_llm
-
-
 # Main function to check for dependencies and install them if necessary
+# Main function to execute based on flags
 main() {
     if $INSTALL; then
-        sudo su - ubuntu -c "check_and_start_docker"
-        sudo su - ubuntu -c "check_and_install_node"
-        sudo su - ubuntu -c "check_and_install_conda"
-        sudo su - ubuntu -c "setup_conda_environment"
-        sudo su - ubuntu -c "check_and_install_poetry"
-        sudo su - ubuntu -c "clone_and_cd_opendevin"
-        sudo su - ubuntu -c "setup_ollama_llm"
-        sudo su - ubuntu -c "check_and_create_config"
-        sudo su - ubuntu -c "check_and_create_workspace"
+        check_and_start_docker
+        check_and_install_node
+        check_and_install_conda
+        setup_conda_environment
+        check_and_install_poetry
+        clone_and_cd_opendevin
+        setup_ollama_llm
+        check_and_create_config
+        check_and_create_workspace
     fi
 
     if $BUILD; then
-        sudo su - ubuntu -c "check_and_start_opendevin"
+        check_and_start_opendevin
     fi
 
     if $RUN; then
-        sudo su - ubuntu -c "cd $HOME/OpenDevin && make run"
+        # Ensure we are in the correct directory
+        if [ "$(pwd)" != "$HOME/OpenDevin" ]; then
+            echo "Changing to the OpenDevin directory..."
+            cd "$HOME/OpenDevin"
+        fi
+        source $HOME/miniconda/etc/profile.d/conda.sh
+        export PATH="$HOME/.local/bin:$PATH"
+        source ~/.bashrc  # or source ~/.zshrc
+        make run || exit $?
     fi
 }
 
