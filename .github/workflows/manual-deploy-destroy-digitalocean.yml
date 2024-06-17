@@ -19,6 +19,14 @@ on:
         description: 'Git branch to checkout'
         default: 'main'
         required: true
+      delete_vm:
+        description: 'Set to true to delete the VM by name'
+        default: 'false'
+        required: false
+      vm_name:
+        description: 'Name of the VM to delete'
+        default: ''
+        required: false
 
 jobs:
   deploy:
@@ -35,11 +43,13 @@ jobs:
 
     - name: Generate Droplet Name
       id: generate_name
+      if: github.event.inputs.delete_vm != 'true'
       run: |
         NAME="opendevin-$(date +%s)"
         echo "droplet_name=${NAME}" >> $GITHUB_ENV
 
     - name: Create Droplet
+      if: github.event.inputs.delete_vm != 'true'
       run: |
         doctl compute droplet create ${{ env.droplet_name }} \
           --region nyc3 \
@@ -50,9 +60,11 @@ jobs:
           --wait
 
     - name: Wait for Droplet to be Ready
+      if: github.event.inputs.delete_vm != 'true'
       run: sleep 30
 
     - name: Get Droplet IP
+      if: github.event.inputs.delete_vm != 'true'
       id: droplet_ip
       run: |
         IP=$(doctl compute droplet list ${{ env.droplet_name }} --format PublicIPv4 --no-header)
@@ -61,17 +73,21 @@ jobs:
         echo "droplet_ip=${IP}" >> $GITHUB_ENV
 
     - name: Debug Environment Variable
+      if: github.event.inputs.delete_vm != 'true'
       run: |
         echo "Environment Variable droplet_ip: ${{ env.droplet_ip }}"
 
     - name: Debug IP Address
+      if: github.event.inputs.delete_vm != 'true'
       run: |
         echo "Droplet IP: ${{ env.droplet_ip }}"
 
     - name: Wait for SSH
+      if: github.event.inputs.delete_vm != 'true'
       run: sleep 60
 
     - name: Run scripts on Droplet
+      if: github.event.inputs.delete_vm != 'true'
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ env.droplet_ip }}
@@ -84,8 +100,9 @@ jobs:
           git clone -b ${{ github.event.inputs.git_branch }} ${{ github.event.inputs.repo_url }} ${{ github.event.inputs.project_name }}
           cd ${{ github.event.inputs.project_name }}
           chmod +x ${{ github.event.inputs.script_name }}
-          ${{ github.event.inputs.script_name }} -i -b
+          ${{ github.event.inputs.script_name }} -i -b || exit $?
 
     - name: Destroy Droplet
+      if: github.event.inputs.delete_vm == 'true' && github.event.inputs.vm_name != ''
       run: |
-        doctl compute droplet delete ${{ env.droplet_name }} --force
+        doctl compute droplet delete ${{ github.event.inputs.vm_name }} --force
