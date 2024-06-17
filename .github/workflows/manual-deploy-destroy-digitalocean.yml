@@ -38,22 +38,18 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-    - name: Generate Droplet Name
-      id: generate_name
-      if: github.event.inputs.delete_vm != 'true'
-      run: |
-        NAME="opendevin-$(date +%s)"
-        echo "droplet_name=${NAME}" >> $GITHUB_ENV
-
     - name: Create Droplet
       if: github.event.inputs.delete_vm != 'true'
+      env:
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        SSH_KEY: ${{ secrets.SSH_KEY }}
       run: |
         doctl compute droplet create "${{ env.droplet_name }}" \
             --region nyc3 \
@@ -63,10 +59,10 @@ jobs:
             --ssh-keys "${{ secrets.SSH_KEY }}" \
             --wait \
             --user-data "#cloud-config
-        users:
-          - name: ${secrets.SSH_USERNAME}
+            users:
+            - name: ${SSH_USERNAME}
             ssh-authorized-keys:
-              - ${secrets.SSH_KEY}
+            - ${SSH_KEY}
             sudo: ['ALL=(ALL) NOPASSWD:ALL']
             groups: sudo
             shell: /bin/bash"
