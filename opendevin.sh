@@ -88,7 +88,7 @@ check_and_start_docker() {
         # Docker is not installed, install it
         echo "Docker is not installed. Installing..."
         sudo apt update
-        sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+        sudo apt install -y apt-transport-https ca-certificates curl software-properties-common python3.11
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
         sudo apt-get update
@@ -186,6 +186,8 @@ check_and_start_opendevin() {
     fi
 
     echo "Building OpenDevin..."
+    source $HOME/miniconda/etc/profile.d/conda.sh
+    source ~/.bashrc  # or source ~/zshrc
     make build
     echo "Starting the OpenDevin server..."
     make run
