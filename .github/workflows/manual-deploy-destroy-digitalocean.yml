@@ -55,7 +55,7 @@ jobs:
     - name: Create Droplet
       if: github.event.inputs.delete_vm != 'true'
       env:
-        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        SSH_USERNAME: ubuntu
         SSH_KEY: ${{ secrets.SSH_KEY }}
       run: |
         doctl compute droplet create "${{ env.droplet_name }}" \
@@ -74,7 +74,6 @@ jobs:
                 groups: sudo
                 shell: /bin/bash'
   
-
     - name: Wait for Droplet to be Ready
       if: github.event.inputs.delete_vm != 'true'
       run: sleep 30
