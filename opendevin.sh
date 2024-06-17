@@ -190,7 +190,7 @@ check_and_start_opendevin() {
     source $HOME/miniconda/etc/profile.d/conda.sh
     export PATH="$HOME/.local/bin:$PATH"
     source ~/.bashrc  # or source ~/.zshrc
-    make build || exit $?
+    make build || (echo "Build failed. Retrying..." && make build) || exit $?
     echo "Starting the OpenDevin server..."
     make run || exit $?
 }
