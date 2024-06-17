@@ -21,4 +21,46 @@ create_user() {
     fi
 }
 
+# Function to check if Docker is installed and start Docker service if it's not running
+check_and_start_docker() {
+    local username=$1
+    if ! command -v docker &> /dev/null; then
+        # Docker is not installed, install it
+        echo "Docker is not installed. Installing..."
+        sudo apt update
+        sudo apt install -y apt-transport-https ca-certificates curl software-properties-common python3.11
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        sudo apt-get update
+        sudo apt-get install -y docker-ce make
+        #sudo groupadd docker
+        sudo usermod -aG docker $username
+        sudo systemctl restart docker
+        echo "Docker has been installed."
+    else
+        echo "Docker is already installed."
+    fi
+
+    # Check if Docker service is running
+    if ! sudo systemctl is-active --quiet docker; then
+        # Docker service is not running, start it
+        echo "Docker service is not running. Starting Docker..."
+        sudo systemctl start docker
+        echo "Docker service has been started."
+    else
+        echo "Docker service is already running."
+    fi
+
+    # Test Docker installation by running a simple container
+    echo "Testing Docker installation with hello-world container..."
+    if docker run hello-world &> /dev/null; then
+        echo "Docker is working correctly."
+    else
+        echo "Failed to run Docker container. Check Docker installation and permissions."
+        echo "Exit shell log back in and try again"
+        exit 1
+    fi
+}
+
 create_user $1
+check_and_start_docker $1
