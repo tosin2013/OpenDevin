@@ -62,7 +62,7 @@ check_and_install_conda() {
         export PATH="$HOME/miniconda/bin:$PATH"
         echo "Conda has been installed."
         # Initialize conda for script use
-        conda init
+        conda init --system
         source $HOME/miniconda/etc/profile.d/conda.sh
     else
         echo "Conda is already installed."
@@ -142,6 +142,7 @@ check_and_install_poetry() {
         echo "Poetry is not installed. Installing..."
         curl -sSL https://install.python-poetry.org | python3.11 -
         export PATH="$HOME/.local/bin:$PATH"
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     else
         echo "Poetry is already installed."
     fi
