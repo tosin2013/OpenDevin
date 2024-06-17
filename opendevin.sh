@@ -190,9 +190,9 @@ check_and_start_opendevin() {
     source $HOME/miniconda/etc/profile.d/conda.sh
     export PATH="$HOME/.local/bin:$PATH"
     source ~/.bashrc  # or source ~/.zshrc
-    make build
+    make build || exit $?
     echo "Starting the OpenDevin server..."
-    make run
+    make run || exit $?
 }
 
 # Function to check if the OpenDevin directory exists in the $HOME directory
@@ -274,7 +274,7 @@ main() {
         source $HOME/miniconda/etc/profile.d/conda.sh
         export PATH="$HOME/.local/bin:$PATH"
         source ~/.bashrc  # or source ~/.zshrc
-        make run
+        make run || exit $?
     fi
 }
 
