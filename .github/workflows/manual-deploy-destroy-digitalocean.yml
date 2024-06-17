@@ -64,15 +64,7 @@ jobs:
             --size s-2vcpu-2gb-amd \
             --vpc-uuid "${{ secrets.VPC_ID }}" \
             --ssh-keys "${{ secrets.SSH_KEY }}" \
-            --wait \
-            --user-data '#cloud-config
-            users:
-              - name: ${SSH_USERNAME}
-                ssh-authorized-keys:
-                  - ${SSH_KEY}
-                sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-                groups: sudo
-                shell: /bin/bash'
+            --wait
   
     - name: Wait for Droplet to be Ready
       if: github.event.inputs.delete_vm != 'true'
@@ -111,7 +103,7 @@ jobs:
         port: 22
         command_timeout: 30m
         script: |
-          cd /home/${{ secrets.SSH_USERNAME }}
+          cd ${{ secrets.SSH_USERNAME }}
           git clone -b ${{ github.event.inputs.git_branch }} ${{ github.event.inputs.repo_url }} ${{ github.event.inputs.project_name }}
           cd ${{ github.event.inputs.project_name }}
           chmod +x ${{ github.event.inputs.script_name }}
