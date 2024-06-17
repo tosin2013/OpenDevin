@@ -22,11 +22,11 @@ on:
       delete_vm:
         description: 'Set to true to delete the VM by name'
         default: 'false'
-        required: 
+        required: true
         type: choice
           options:
-            - true 
-            - false
+            - "true" 
+            - "false"
       vm_name:
         description: 'Name of the VM to delete'
         default: ''
