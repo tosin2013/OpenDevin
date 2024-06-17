@@ -55,21 +55,21 @@ jobs:
     - name: Create Droplet
       if: github.event.inputs.delete_vm != 'true'
       run: |
-        doctl compute droplet create ${{ env.droplet_name }} \
-          --region nyc3 \
-          --image ubuntu-22-04-x64 \
-          --size s-2vcpu-2gb-amd \
-          --vpc-uuid ${{ secrets.VPC_ID }} \
-          --ssh-keys ${{ secrets.SSH_KEY }} \
-          --wait \
-          --user-data "#cloud-config
-          users:
-            - name: ${{ secrets.SSH_USERNAME }}
-              ssh-authorized-keys:
-          - ${{ secrets.SSH_KEY }}
-              sudo: ['ALL=(ALL) NOPASSWD:ALL']
-              groups: sudo
-              shell: /bin/bash"
+        doctl compute droplet create "${{ env.droplet_name }}" \
+            --region nyc3 \
+            --image ubuntu-22-04-x64 \
+            --size s-2vcpu-2gb-amd \
+            --vpc-uuid "${{ secrets.VPC_ID }}" \
+            --ssh-keys "${{ secrets.SSH_KEY }}" \
+            --wait \
+            --user-data "#cloud-config
+        users:
+          - name: ${secrets.SSH_USERNAME}
+            ssh-authorized-keys:
+              - ${secrets.SSH_KEY}
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            groups: sudo
+            shell: /bin/bash"
 
     - name: Wait for Droplet to be Ready
       if: github.event.inputs.delete_vm != 'true'
