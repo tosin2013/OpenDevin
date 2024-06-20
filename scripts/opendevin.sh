@@ -4,6 +4,22 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -x
 export DEBIAN_FRONTEND=noninteractive
 
+if [ ! -z $VITE_BACKEND_HOST ];
+then
+    echo "VITE_BACKEND_HOST is set to $VITE_BACKEND_HOST"
+else
+    echo "VITE_BACKEND_HOST is not set. Setting to http://127.0.0.1:3000"
+    export VITE_BACKEND_HOST="127.0.0.1:3000" 
+fi
+
+if [ ! -z $VITE_USE_TLS ];
+then
+    echo "VITE_USE_TLS is set to $VITE_USE_TLS"
+else
+    echo "VITE_USE_TLS is not set. Setting to false"
+    export VITE_USE_TLS="false"
+fi
+
 # Function to display help
 usage() {
     echo "Usage: $0 [-b] [-r] [-i] [-o] [-h]"
@@ -190,6 +206,8 @@ check_and_start_opendevin() {
     echo "Building OpenDevin..."
     source $HOME/miniconda/etc/profile.d/conda.sh
     export PATH="$HOME/.local/bin:$PATH"
+    export VITE_BACKEND_HOST=${VITE_BACKEND_HOST}
+    export VITE_USE_TLS=${VITE_USE_TLS}
     source ~/.bashrc  # or source ~/.zshrc
     make build || (echo "Build failed. Retrying..." && make build) || exit $?
     #echo "Starting the OpenDevin server..."
